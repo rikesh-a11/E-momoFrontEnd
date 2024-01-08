@@ -1,26 +1,29 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { add } from "../../../store/cartSlice";
+import { fetchProducts } from "../../../store/productSlice";
 
 const Product = () => {
-  const [products, setProducts] = useState([]);
+  
   const dispatch = useDispatch()
-
-  const fetchProducts = async () => {
-    const response = await axios.get("http://localhost:3000/api/products");
-    if (response.status == 200) {
-      setProducts(response.data.data);
-    }
-  };
+  const {data : products,status } = useSelector((state)=>state.product)
+  
+ 
   useEffect(() => {
-    fetchProducts();
+   dispatch(fetchProducts())
   }, []);
 
   const addToCart = (product) =>{
     dispatch(add(product))
   }
 
+  if(status == "loading"){
+    return <h1>Loading ..</h1>
+  }
+  if(status == "error"){
+    return <h1>Error! something went wrong</h1>
+  }
   return (
     <>
       <div className="relative bg-white-50">
@@ -29,7 +32,9 @@ const Product = () => {
             Our Popular Foods
           </h1>
           <div className="flex flex-wrap justify-between">
-            {products.map((product) => {
+
+          {
+            products.map((product) => {
               return (
                 <div
                   ke={product._id}
