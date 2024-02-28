@@ -3,26 +3,26 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { add } from "../../../store/cartSlice";
 import { fetchProducts } from "../../../store/productSlice";
+import { useNavigate } from "react-router-dom";
 
 const Product = () => {
-  
-  const dispatch = useDispatch()
-  const {data : products,status } = useSelector((state)=>state.product)
-  
- 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { data: products, status } = useSelector((state) => state.product);
+
   useEffect(() => {
-   dispatch(fetchProducts())
+    dispatch(fetchProducts());
   }, []);
 
-  const addToCart = (product) =>{
-    dispatch(add(product))
-  }
+  const addToCart = (product) => {
+    dispatch(add(product));
+  };
 
-  if(status == "loading"){
-    return <h1>Loading ..</h1>
+  if (status == "loading") {
+    return <h1>Loading ..</h1>;
   }
-  if(status == "error"){
-    return <h1>Error! something went wrong</h1>
+  if (status == "error") {
+    return <h1>Error! something went wrong</h1>;
   }
   return (
     <>
@@ -32,12 +32,11 @@ const Product = () => {
             Our Popular Foods
           </h1>
           <div className="flex flex-wrap justify-between">
-
-          {
-            products.map((product) => {
+            {products.map((product) => {
               return (
                 <div
-                  ke={product._id}
+                  onClick={() => navigate(`/productDetails/${product._id}`)}
+                  key={product._id}
                   className="mx-auto mt-10 mb-10 w-80 transform overflow-hidden rounded-lg bg-white dark:bg-slate-800 shadow-md duration-300 hover:scale-105 hover:shadow-lg"
                 >
                   <img
@@ -59,7 +58,10 @@ const Product = () => {
                       <p className="text-base  font-medium text-gray-500 line-through dark:text-gray-300">
                         $25.00
                       </p>
-                      <button onClick={()=> addToCart(product)} className="px-4 py-2 mx-6 font-bold text-white bg-yellow-300 rounded hover:bg-yellow-600">
+                      <button
+                        onClick={() => addToCart(product)}
+                        className="px-4 py-2 mx-6 font-bold text-white bg-yellow-300 rounded hover:bg-yellow-600"
+                      >
                         Add to Cart
                       </button>
                     </div>
