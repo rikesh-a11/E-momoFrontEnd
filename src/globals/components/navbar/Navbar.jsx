@@ -1,10 +1,27 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { logOut } from "../../../store/authSlice";
+import { useEffect } from "react";
+import { fetchCartItems } from "../../../store/cartSlice";
 
 export default function Navbar() {
-  
-  const navigate = useNavigate()
-  const items = useSelector((state)=>state.cart)
+  const { data: user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const { items } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+
+  const handleLogOut = () => {
+    //empty data from auth store
+    dispatch(logOut());
+
+    //localStorage clear
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
+  useEffect(() => {
+    dispatch(fetchCartItems());
+  }, [dispatch]);
   return (
     <>
       <nav className="fixed z-10 w-full bg-white md:absolute md:bg-transparent">
@@ -12,7 +29,8 @@ export default function Navbar() {
           <div className="flex flex-wrap items-center justify-between py-3 gap-6 md:py-4 md:gap-0">
             <div className="w-full px-6 flex justify-between lg:w-max md:px-0">
               <a
-                href="" onClick={()=>navigate("/")}
+                href=""
+                onClick={() => navigate("/")}
                 aria-label="logo"
                 className="flex space-x-2 items-center"
               >
@@ -48,12 +66,12 @@ export default function Navbar() {
               <div className="text-gray-600 lg:pr-4">
                 <ul className="space-y-6 tracking-wide font-medium text-sm md:flex md:space-y-0">
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/profile"
                       className="block md:px-4 transition hover:text-yellow-700"
                     >
-                      <span>I've a restaurant</span>
-                    </a>
+                      <span>Profile</span>
+                    </Link>
                   </li>
                   <li>
                     <a
@@ -63,35 +81,59 @@ export default function Navbar() {
                       <span>Wishlist</span>
                     </a>
                   </li>
-                  <li>
-                    <a
-                      href="#" onClick={()=>navigate("/cart")}
-                      className="block md:px-4 transition hover:text-yellow-700"
-                    >
-                      <span>Cart <sup>{items.length}</sup></span>
-                    </a>
-                  </li>
+
+                  {items.length !== 0 && (
+                    <li>
+                      <a
+                        href="#"
+                        onClick={() => navigate("/cart")}
+                        className="block transition md:px-4 hover:text-yellow-700"
+                      >
+                        <span>
+                          Cart <sup>{items.length}</sup>{" "}
+                        </span>
+                      </a>
+                    </li>
+                  )}
                 </ul>
               </div>
               <div className="w-full space-y-2 border-yellow-200 lg:space-y-0 md:w-max lg:border-l">
-                <button
-                  type="button"
-                  title="Start buying"
-                  className="w-full py-3 px-6 text-center rounded-full transition active:bg-yellow-200 focus:bg-yellow-100 sm:w-max"
-                >
-                  <span className="block text-yellow-800 font-semibold text-sm">
-                    <Link to="/register">Register</Link>
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  title="Start buying"
-                  className="w-full py-3 px-6 text-center rounded-full transition bg-yellow-300 hover:bg-yellow-100 active:bg-yellow-400 focus:bg-yellow-300 sm:w-max"
-                >
-                  <span className="block text-yellow-900 font-semibold text-sm">
-                    <Link to="/login">Login</Link>
-                  </span>
-                </button>
+                {user.length == 0 &&
+                (localStorage.getItem("token") == "" ||
+                  localStorage.getItem("token") == null ||
+                  localStorage.getItem("token") == undefined) ? (
+                  <>
+                    <button
+                      type="button"
+                      title="Start buying"
+                      className="w-full py-3 px-6 text-center rounded-full transition active:bg-yellow-200 focus:bg-yellow-100 sm:w-max"
+                    >
+                      <span className="block text-yellow-800 font-semibold text-sm">
+                        <Link to="/register">Register</Link>
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      title="Start buying"
+                      className="w-full py-3 px-6 text-center rounded-full transition bg-yellow-300 hover:bg-yellow-100 active:bg-yellow-400 focus:bg-yellow-300 sm:w-max"
+                    >
+                      <span className="block text-yellow-900 font-semibold text-sm">
+                        <Link to="/login">Login</Link>
+                      </span>
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={handleLogOut}
+                    type="button"
+                    title="Start buying"
+                    className="w-full py-3 px-6 text-center rounded-full transition bg-yellow-300 hover:bg-yellow-100 active:bg-yellow-400 focus:bg-yellow-300 sm:w-max"
+                  >
+                    <span className="block text-yellow-900 font-semibold text-sm">
+                      Log Out
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
           </div>
